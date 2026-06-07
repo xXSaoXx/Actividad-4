@@ -1,117 +1,293 @@
 import math
+import tkinter as tk
+from tkinter import messagebox
+
 
 class algebra:
     @staticmethod
     def calcular_logaritmo_neperiano(valor):
-        
-        try:
-            if valor <= 0:
-                raise ArithmeticError("El valor debe ser un numero positivo")
-            resultado_logaritmo = math.log(valor)
-            print("Resultado del logaritmo=", resultado_logaritmo)
-        
-        except ArithmeticError:
-            print("El valor debe de ser un numero positivo para calcular el logaritmo")
+        if valor <= 0:
+            raise ArithmeticError("El valor debe ser positivo para calcular el logaritmo")
+        return math.log(valor)
+
     @staticmethod
     def calcular_raiz_cuadrada(valor):
-        
-        try:
-            if valor < 0:
-                raise ArithmeticError("El valor debe de ser positivo o 0 para calcular su raiz")
-            resultado_raiz = math.sqrt(valor)
-            print("Resultado de la raiz cuadrada=", resultado_raiz)
-        
-        except ArithmeticError:
-            print("El valor debe ser un numero positivo para calcular su raiz")
+        if valor < 0:
+            raise ArithmeticError("El valor debe ser positivo o cero para calcular la raiz")
+        return math.sqrt(valor)
+
 
 class recta:
     @staticmethod
     def calcular_pendiente(x1, x2, y1, y2):
-        
-        try:
-            if x1 == x2:
-                raise ArithmeticError("Los valores x1 y x2 no pueden ser iguales")
-            m = (y2 - y1) / (x2 - x1)
-            print("La pendiente de la recta es =", m)
-        
-        except ArithmeticError:
-            print("Para calcular la pendiente, los valores de x no pueden ser iguales")
+        if x1 == x2:
+            raise ArithmeticError("Los valores x1 y x2 no pueden ser iguales")
+        return (y2 - y1) / (x2 - x1)
+
     @staticmethod
     def calcular_punto_medio(x1, x2, y1, y2):
-        
-            puntox = (x1 + x2)/2
-            puntoy = (y1 + y2)/2
-            print(f"El punto medio de la recta es = ({puntox} , {puntoy})")
+        puntox = (x1 + x2) / 2
+        puntoy = (y1 + y2) / 2
+        return puntox, puntoy
+
 
 class ecuacion:
-    @staticmethod        
+    @staticmethod
     def calcular_raices_ecuacion(a, b, c):
-        try:
-            if a == 0:
-                raise ArithmeticError("El valor de a no puede ser cero")
+        if a == 0:
+            raise ArithmeticError("El valor de a no puede ser cero")
 
-            discriminante = b**2 - 4*a*c
+        discriminante = b**2 - 4 * a * c
 
-            if discriminante < 0:
-                print("La ecuación no tiene raíces reales")
-            
-            elif discriminante == 0:
-                x = -b / (2*a)
-                print(f"La ecuación tiene una raíz real: x = {x}")
-            
-            else:
-                x1 = (-b + math.sqrt(discriminante)) / (2*a)
-                x2 = (-b - math.sqrt(discriminante)) / (2*a)
-                print(f"Las raíces son x1 = {x1} y x2 = {x2}")
+        if discriminante < 0:
+            return "La ecuacion no tiene raices reales"
 
-        except ArithmeticError:
-            print("Para calcular las raics, el valor de a no puede ser cero")
+        if discriminante == 0:
+            x = -b / (2 * a)
+            return f"La ecuacion tiene una raiz real: x = {x}"
+
+        x1 = (-b + math.sqrt(discriminante)) / (2 * a)
+        x2 = (-b - math.sqrt(discriminante)) / (2 * a)
+        return f"Las raices son x1 = {x1} y x2 = {x2}"
+
 
 class conversion:
     @staticmethod
     def calcular_base(num, base):
+        if base < 2:
+            raise ArithmeticError("La base debe ser mayor o igual a 2")
+
+        if base > 36:
+            raise ArithmeticError("La base maxima permitida es 36")
+
+        if num < 0:
+            raise ArithmeticError("El numero debe ser positivo")
+
+        digitos = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+        if num == 0:
+            return "0"
+
+        resultado = ""
+
+        while num > 0:
+            residuo = num % base
+            resultado = digitos[residuo] + resultado
+            num = num // base
+
+        return resultado
+
+
+def crear_label_entry(ventana, texto, fila):
+    tk.Label(ventana, text=texto).grid(row=fila, column=0, padx=10, pady=5, sticky="w")
+    entrada = tk.Entry(ventana)
+    entrada.grid(row=fila, column=1, padx=10, pady=5)
+    return entrada
+
+
+def ventana_algebra():
+    ventana = tk.Toplevel()
+    ventana.title("Algebra")
+    ventana.geometry("420x240")
+
+    entrada_valor = crear_label_entry(ventana, "Digite un valor:", 0)
+
+    resultado = tk.Label(ventana, text="", fg="blue", justify="left")
+    resultado.grid(row=3, column=0, columnspan=2, pady=10)
+
+    def calcular():
         try:
-            if base < 2:
-                raise ArithmeticError("La base debe de ser mayor o igual a 2")
-            
-            if num == 0:
-                print("El numero convertido es 0")
-            else:
-                residuo_total = ""
-                while num > 0:
-                    residuo = num % base
-                    residuo_total = str(residuo) + residuo_total
-                    num = num // base
-                print(f"El numero convertido es {residuo_total}")
-        
+            valor = float(entrada_valor.get())
+
+            logaritmo = algebra.calcular_logaritmo_neperiano(valor)
+            raiz = algebra.calcular_raiz_cuadrada(valor)
+
+            resultado.config(
+                text=f"Logaritmo neperiano = {logaritmo}\nRaiz cuadrada = {raiz}"
+            )
+
         except ValueError:
-            print("Debe ingresar valores numericos enteros")
+            messagebox.showerror("Error", "Digite un valor numerico")
+        except ArithmeticError as error:
+            messagebox.showerror("Error", str(error))
 
-        except ArithmeticError:
-            print("La base debe ser mayor o igual a 2")
+    def limpiar():
+        entrada_valor.delete(0, tk.END)
+        resultado.config(text="")
 
-                
+    tk.Button(ventana, text="Calcular", width=15, command=calcular).grid(
+        row=1, column=0, pady=10
+    )
 
-valor = float(input("Digite un un valor numerico = "))
+    tk.Button(ventana, text="Limpiar", width=15, command=limpiar).grid(
+        row=1, column=1, pady=10
+    )
 
-x1 = float(input("Digite x1 = "))
-x2 = float(input("Digite x2 = "))
-y1 = float(input("Digite y1 = "))
-y2 = float(input("Digite y2 = "))
 
-a = float(input("Digite a de la ecuacion cuadratica = "))
-b = float(input("Digite b de la ecuacion cuadratica = "))
-c = float(input("Digite c de la ecuacion cuadratica = "))
+def ventana_recta():
+    ventana = tk.Toplevel()
+    ventana.title("Recta")
+    ventana.geometry("450x320")
 
-num = int(input("Digite el numero en base 10 = "))
-base = int(input("Digite la base = "))
+    entrada_x1 = crear_label_entry(ventana, "Digite x1:", 0)
+    entrada_x2 = crear_label_entry(ventana, "Digite x2:", 1)
+    entrada_y1 = crear_label_entry(ventana, "Digite y1:", 2)
+    entrada_y2 = crear_label_entry(ventana, "Digite y2:", 3)
 
-algebra.calcular_logaritmo_neperiano(valor)
-algebra.calcular_raiz_cuadrada(valor)
+    resultado = tk.Label(ventana, text="", fg="blue", justify="left")
+    resultado.grid(row=6, column=0, columnspan=2, pady=10)
 
-recta.calcular_pendiente(x1, x2, y1, y2)
-recta.calcular_punto_medio(x1, x2, y1, y2)
+    def calcular():
+        try:
+            x1 = float(entrada_x1.get())
+            x2 = float(entrada_x2.get())
+            y1 = float(entrada_y1.get())
+            y2 = float(entrada_y2.get())
 
-ecuacion.calcular_raices_ecuacion(a, b, c)
+            pendiente = recta.calcular_pendiente(x1, x2, y1, y2)
+            puntox, puntoy = recta.calcular_punto_medio(x1, x2, y1, y2)
 
-conversion.calcular_base(num, base)
+            resultado.config(
+                text=f"Pendiente = {pendiente}\nPunto medio = ({puntox}, {puntoy})"
+            )
+
+        except ValueError:
+            messagebox.showerror("Error", "Digite unicamente valores numericos")
+        except ArithmeticError as error:
+            messagebox.showerror("Error", str(error))
+
+    def limpiar():
+        entrada_x1.delete(0, tk.END)
+        entrada_x2.delete(0, tk.END)
+        entrada_y1.delete(0, tk.END)
+        entrada_y2.delete(0, tk.END)
+        resultado.config(text="")
+
+    tk.Button(ventana, text="Calcular", width=15, command=calcular).grid(
+        row=4, column=0, pady=10
+    )
+
+    tk.Button(ventana, text="Limpiar", width=15, command=limpiar).grid(
+        row=4, column=1, pady=10
+    )
+
+
+def ventana_ecuacion():
+    ventana = tk.Toplevel()
+    ventana.title("Ecuacion cuadratica")
+    ventana.geometry("460x270")
+
+    entrada_a = crear_label_entry(ventana, "Digite a:", 0)
+    entrada_b = crear_label_entry(ventana, "Digite b:", 1)
+    entrada_c = crear_label_entry(ventana, "Digite c:", 2)
+
+    resultado = tk.Label(ventana, text="", fg="blue", wraplength=400)
+    resultado.grid(row=5, column=0, columnspan=2, pady=10)
+
+    def calcular():
+        try:
+            a = float(entrada_a.get())
+            b = float(entrada_b.get())
+            c = float(entrada_c.get())
+
+            respuesta = ecuacion.calcular_raices_ecuacion(a, b, c)
+            resultado.config(text=respuesta)
+
+        except ValueError:
+            messagebox.showerror("Error", "Digite unicamente valores numericos")
+        except ArithmeticError as error:
+            messagebox.showerror("Error", str(error))
+
+    def limpiar():
+        entrada_a.delete(0, tk.END)
+        entrada_b.delete(0, tk.END)
+        entrada_c.delete(0, tk.END)
+        resultado.config(text="")
+
+    tk.Button(ventana, text="Calcular", width=15, command=calcular).grid(
+        row=3, column=0, pady=10
+    )
+
+    tk.Button(ventana, text="Limpiar", width=15, command=limpiar).grid(
+        row=3, column=1, pady=10
+    )
+
+
+def ventana_conversion():
+    ventana = tk.Toplevel()
+    ventana.title("Conversion de base")
+    ventana.geometry("420x240")
+
+    entrada_num = crear_label_entry(ventana, "Numero en base 10:", 0)
+    entrada_base = crear_label_entry(ventana, "Base:", 1)
+
+    resultado = tk.Label(ventana, text="", fg="blue")
+    resultado.grid(row=4, column=0, columnspan=2, pady=10)
+
+    def calcular():
+        try:
+            num = int(entrada_num.get())
+            base = int(entrada_base.get())
+
+            convertido = conversion.calcular_base(num, base)
+            resultado.config(text=f"Numero convertido = {convertido}")
+
+        except ValueError:
+            messagebox.showerror("Error", "Digite valores numericos enteros")
+        except ArithmeticError as error:
+            messagebox.showerror("Error", str(error))
+
+    def limpiar():
+        entrada_num.delete(0, tk.END)
+        entrada_base.delete(0, tk.END)
+        resultado.config(text="")
+
+    tk.Button(ventana, text="Calcular", width=15, command=calcular).grid(
+        row=2, column=0, pady=10
+    )
+
+    tk.Button(ventana, text="Limpiar", width=15, command=limpiar).grid(
+        row=2, column=1, pady=10
+    )
+
+
+ventana_principal = tk.Tk()
+ventana_principal.title("Calculadora matematica")
+ventana_principal.geometry("350x260")
+
+tk.Label(
+    ventana_principal,
+    text="Seleccione una opcion",
+    font=("Arial", 14)
+).pack(pady=15)
+
+tk.Button(
+    ventana_principal,
+    text="Algebra",
+    width=25,
+    command=ventana_algebra
+).pack(pady=5)
+
+tk.Button(
+    ventana_principal,
+    text="Recta",
+    width=25,
+    command=ventana_recta
+).pack(pady=5)
+
+tk.Button(
+    ventana_principal,
+    text="Ecuacion cuadratica",
+    width=25,
+    command=ventana_ecuacion
+).pack(pady=5)
+
+tk.Button(
+    ventana_principal,
+    text="Conversion de base",
+    width=25,
+    command=ventana_conversion
+).pack(pady=5)
+
+ventana_principal.mainloop()
+
