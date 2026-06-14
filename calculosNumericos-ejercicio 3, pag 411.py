@@ -85,6 +85,29 @@ def crear_label_entry(ventana, texto, fila):
     return entrada
 
 
+def mostrar_mensaje_correcto(titulo, mensaje):
+    ventana_mensaje = tk.Toplevel()
+    ventana_mensaje.title(titulo)
+    ventana_mensaje.geometry("280x160")
+    ventana_mensaje.resizable(False, False)
+
+    tk.Label(
+        ventana_mensaje,
+        text=mensaje,
+        justify="left",
+        font=("Arial", 10)
+    ).pack(padx=25, pady=25)
+
+    tk.Button(
+        ventana_mensaje,
+        text="Aceptar",
+        width=12,
+        command=ventana_mensaje.destroy
+    ).pack(pady=5)
+
+    ventana_mensaje.grab_set()
+
+
 def ventana_algebra():
     ventana = tk.Toplevel()
     ventana.title("Algebra")
@@ -101,6 +124,8 @@ def ventana_algebra():
 
             logaritmo = algebra.calcular_logaritmo_neperiano(valor)
             raiz = algebra.calcular_raiz_cuadrada(valor)
+
+            mostrar_mensaje_correcto("Dato correcto", f"Valor: {valor}")
 
             resultado.config(
                 text=f"Logaritmo neperiano = {logaritmo}\nRaiz cuadrada = {raiz}"
@@ -147,6 +172,11 @@ def ventana_recta():
             pendiente = recta.calcular_pendiente(x1, x2, y1, y2)
             puntox, puntoy = recta.calcular_punto_medio(x1, x2, y1, y2)
 
+            mostrar_mensaje_correcto(
+                "Datos correctos",
+                f"x1: {x1}\nx2: {x2}\ny1: {y1}\ny2: {y2}"
+            )
+
             resultado.config(
                 text=f"Pendiente = {pendiente}\nPunto medio = ({puntox}, {puntoy})"
             )
@@ -191,6 +221,12 @@ def ventana_ecuacion():
             c = float(entrada_c.get())
 
             respuesta = ecuacion.calcular_raices_ecuacion(a, b, c)
+
+            mostrar_mensaje_correcto(
+                "Datos correctos",
+                f"a: {a}\nb: {b}\nc: {c}"
+            )
+
             resultado.config(text=respuesta)
 
         except ValueError:
@@ -230,6 +266,12 @@ def ventana_conversion():
             base = int(entrada_base.get())
 
             convertido = conversion.calcular_base(num, base)
+
+            mostrar_mensaje_correcto(
+                "Datos correctos",
+                f"Numero en base 10: {num}\nBase: {base}"
+            )
+
             resultado.config(text=f"Numero convertido = {convertido}")
 
         except ValueError:
@@ -290,4 +332,3 @@ tk.Button(
 ).pack(pady=5)
 
 ventana_principal.mainloop()
-
